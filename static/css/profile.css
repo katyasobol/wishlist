@@ -20,12 +20,13 @@
 
 .profile-card {
     display: flex;
+    position: fixed;
     flex-direction: column;
     align-items: center;
-    max-width: 400px;
+    max-width: 600px;
     width: 100%;
     border-radius: 25px;
-    padding: 30px;
+    padding: 65px;
     border: 1px solid #ffffff40;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
 }
@@ -52,7 +53,7 @@
 }
 
 .data h2 {
-    font-size: 33px;
+    font-size: 40px;
     font-weight: 600;
 }
 
@@ -68,16 +69,38 @@ span {
 
 .row .info {
     text-align: center;
-    padding: 0 20px;
+    padding: 0 30px;
 }
 
 .buttons {
     display: flex;
     align-items: center;
-    margin-top: 30px;
+    margin-top: 40px;
 }
 
 .buttons .btn {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 30px;
+    padding: 8px 30px;
+    border-radius: 25px;
+    font-size: 19px;
+    white-space: nowrap;
+    background: linear-gradient(to left, #33ccff 0%, #ff99cc 100%);
+}
+
+.buttons .btn:hover {
+    box-shadow: inset 0 5px 20px rgba(0, 0, 0, 0.4);
+}
+
+.buttonset {
+    display: flex;
+    position: relative;
+    left: 43%;
+    margin-bottom: 47%;
+}
+
+.buttonset .btn {
     color: #fff;
     text-decoration: none;
     margin: 0 20px;
@@ -88,6 +111,6 @@ span {
     background: linear-gradient(to left, #33ccff 0%, #ff99cc 100%);
 }
 
-.buttons .btn:hover {
+.buttonset .btn:hover {
     box-shadow: inset 0 5px 20px rgba(0, 0, 0, 0.4);
 }

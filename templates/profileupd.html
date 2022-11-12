@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<!-- Created By CodingLab - www.codinglabweb.com -->
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <!---<title> Responsive Registration Form | CodingLab </title>--->
+    <link type='text/css' href="{{ url_for('static', filename='css/style.css')}}" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <div class="container">
+        <div class="title">Настройки аккаунта</div>
+        <div class="content">
+            <form action="#" method="post">
+                <div class="user-details">
+                    <div class="input-box">
+                        <span class="details">Имя</span>
+                        <input type="text" placeholder="Введите свое имя" name="firstname" value="" required>
+                    </div>
+                    <div class="input-box">
+                        <span class="details">Фамилия</span>
+                        <input type="text" placeholder="Введите свою фамилию" name="lastname" value="" required>
+                    </div>
+                    <div class="input-box">
+                        <span class="details">Дата рождения</span>
+                        <input type="text" name="birthdate" value="" required>
+                    </div>
+                </div>
+                <div class="button">
+                    <input type="submit" value="Обновить">
+                    <a href="profile"> </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+
+</html>

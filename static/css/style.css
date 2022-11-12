@@ -130,3 +130,14 @@ form .button input:hover {
         flex-direction: column;
     }
 }
+
+.buttonset {
+    display: flex;
+    position: relative;
+    margin-left: 47%;
+}
+
+.buttonset .btn {
+    color: black;
+    text-decoration: none;
+}
