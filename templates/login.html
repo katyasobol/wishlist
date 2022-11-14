@@ -14,18 +14,19 @@
         <div class="title">Вход</div>
         <div class="content">
             <form action="#" method="post">
+                {{ form.hidden_tag() }}
                 <div class="user-details">
                     <div class="input-box">
                         <span class="details">Username</span>
-                        <input type="text" placeholder="Введите свой юзернейм" name="username" value="" required>
+                        {{ form.username }}
                     </div>
                     <div class="input-box">
                         <span class="details">Пароль</span>
-                        <input type="password" placeholder="Введите Пароль" name="psw" value="" required>
+                        {{ form.password }}
                     </div>
                 </div>
                 <div class="button">
-                    <input type="submit" value="Войти">
+                    {{ form.submit }}
                 </div>
             </form>
         </div>

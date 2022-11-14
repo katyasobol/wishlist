@@ -14,22 +14,23 @@
         <div class="title">Настройки аккаунта</div>
         <div class="content">
             <form action="#" method="post">
+                {{ form.hidden_tag() }}
                 <div class="user-details">
                     <div class="input-box">
                         <span class="details">Имя</span>
-                        <input type="text" placeholder="Введите свое имя" name="firstname" value="" required>
+                        {{ form.firstname }}
                     </div>
                     <div class="input-box">
                         <span class="details">Фамилия</span>
-                        <input type="text" placeholder="Введите свою фамилию" name="lastname" value="" required>
+                        {{ form.lastname }}
                     </div>
                     <div class="input-box">
                         <span class="details">Дата рождения</span>
-                        <input type="text" name="birthdate" value="" required>
+                        {{ form.birthdate }}
                     </div>
                 </div>
                 <div class="button">
-                    <input type="submit" value="Обновить">
+                    {{ form.submit }}
                     <a href="profile"> </a>
                 </div>
             </form>
