@@ -1,8 +1,8 @@
 from flask import Flask, request, render_template, url_for, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin, current_user, LoginManager, login_required, login_user
+from flask_login import UserMixin, current_user, LoginManager, login_required, login_user, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
-from forms import LoginForm, RegisterForm, ProfileForm
+from forms import LoginForm, RegisterForm, ProfileForm, validate_date
 import psycopg2
 
 app = Flask(__name__)
@@ -49,6 +49,10 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
+@app.route('/wishlist', methods=['POST', 'GET'])
+def index():
+    return redirect(url_for('login'))
+
 @app.route('/register', methods=['POST', 'GET'])
 def register():
     form = RegisterForm()
@@ -70,6 +74,7 @@ def register():
 @app.route('/profile', methods=('POST', 'GET'))
 @login_required
 def profile():
+    form = None
     if current_user.is_authenticated:
         for raw in db.session.query(Profile).where(Profile.user_id == current_user.id):
                 form = raw
@@ -103,25 +108,37 @@ def login():
             for raw in db.session.query(User).where(User.user == username):
                 user = raw
             if username == user.user and check_password_hash(user.psw, psw):
-                login_user(user=user, remember=True)
+                login_user(user=user)
                 return redirect(url_for('profile'))
             flash("Неверная пара логин/пароль", "error")
-    return render_template('login.html', form=form)      
+    return render_template('login.html', form=form)  
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))    
 
 @app.route('/profile/update', methods=('POST', 'GET'))
 @login_required
 def prof_upd():
-    form = ProfileForm
     if request.method == 'POST':
-        if request.get_data():
+        if Profile.query.get(current_user.id):
             try:
-                Profile.query.filter(Profile.user_id == current_user.id).update({'firstname': request.form.get('firstname')})
-                Profile.query.filter(Profile.user_id == current_user.id).update({'lastname': request.form.get('lastname')})
-                Profile.query.filter(Profile.user_id == current_user.id).update({'birthdate': request.form.get('birthdate')})
-                db.session.commit()
+                for raw in db.session.query(Profile).where(Profile.user_id == current_user.id):
+                    user = raw
+                    user.firstname = request.form.get('firstname') if request.form.get('firstname') else user.firstname
+                    user.lastname = request.form.get('lastname') if request.form.get('lastname') else user.lastname
+                    user.birthdate = request.form.get('birthdate') if request.form.get('birthdate') and validate_date(request.form.get('birthdate')) else user.birthdate
+                    db.session.commit()
+                    return redirect(url_for('profile'))
             except:
-                db.session.rollback()
-                return 'hrsghe'
+                    db.session.rollback()
+                    return 'hrsghe'
+        p = Profile(firstname=request.form['firstname'], lastname=request.form['lastname'], birthdate=request.form['birthdate'], user_id=current_user.id)
+        db.session.add(p)
+        db.session.commit()
+        return redirect(url_for('profile'))
     return render_template('prof_upd.html')
 
 
