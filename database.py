@@ -111,14 +111,17 @@ def login():
 @app.route('/profile/update', methods=('POST', 'GET'))
 @login_required
 def prof_upd():
+    form = ProfileForm
     if request.method == 'POST':
-        if request.form.get('firstname'):
-            res = request.form.get('firstname')
-            Profile.query.filter(Profile.user_id == current_user.id).update({'firstname': res})
-            db.session.commit()
-            #return redirect(url_for('profile'))
-        #lastname = request.form.get('lastname')
-        #birthdate = request.form.get('birthdate')
+        if request.get_data():
+            try:
+                Profile.query.filter(Profile.user_id == current_user.id).update({'firstname': request.form.get('firstname')})
+                Profile.query.filter(Profile.user_id == current_user.id).update({'lastname': request.form.get('lastname')})
+                Profile.query.filter(Profile.user_id == current_user.id).update({'birthdate': request.form.get('birthdate')})
+                db.session.commit()
+            except:
+                db.session.rollback()
+                return 'hrsghe'
     return render_template('prof_upd.html')
 
 
