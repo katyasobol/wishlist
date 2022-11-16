@@ -1,6 +1,7 @@
 from flask_wtf.form import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, EmailField, ValidationError
 from wtforms.validators import InputRequired, Length, Email, EqualTo, Regexp
+from base64 import b64decode, b64encode
 import re
 
 class LoginForm(FlaskForm):
@@ -31,3 +32,8 @@ def validate_date(field):
         if re.fullmatch(field, r'\d\d\.\d\d\.\d{4}'):
             raise ValidationError('дата формата дд,мм.гггг')
         return True
+
+def binary_enc(img):
+    with open(img, 'rb') as f:
+        binar = b64encode(f.read())
+    return binar

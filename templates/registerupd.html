@@ -13,9 +13,12 @@
     <div class="container">
         <div class="title">Настройки аккаунта</div>
         <div class="content">
-            <form action="#" method="post">
+            <form action="#" method="post" enctype="multipart/form-data">
                 {{ form.hidden_tag() }}
                 <div class="user-details">
+                    <div class="image">
+                        <p><input type="file" name="img" class="profile-pic">
+                    </div>
                     <div class="input-box">
                         <span class="details">Имя</span>
                         {{ form.firstname }}
