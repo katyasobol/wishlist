@@ -19,21 +19,17 @@ class RegisterForm(FlaskForm):
 class ProfileForm(FlaskForm):
     firstname = StringField(validators=[InputRequired(), Length(max=20)], render_kw={"placeholder": "Введите имя"}, name='firstname')
     lastname = StringField(validators=[InputRequired(), Length(max=20)], render_kw={"placeholder": "Введите Фамилию"}, name='lastname')
-    birthdate = StringField(validators=[InputRequired(message='Дата вида дд.мм.гггг'), Length(min=4, max=20), Regexp(r'\d\d.\d\d.\d{4}', message='Дата вида дд.мм.гггг')], render_kw={"placeholder": "Введите дату рождения"}, name='birthdate')
-    submit = SubmitField("Изменить")
+    birthdate = StringField(validators=[InputRequired(), Length(max=10), Regexp(r'\d\d.\d\d.\d{4}', message='Дата вида дд.мм.гггг')], render_kw={"placeholder": "Введите дату рождения"}, name='birthdate')
+    submit = SubmitField("Сохранить")
 
 class ProfileUpdateForm(FlaskForm):
     firstname = StringField(validators=[Length(max=20)], render_kw={"placeholder": "Введите имя"}, name='firstname')
     lastname = StringField(validators=[Length(max=20)], render_kw={"placeholder": "Введите Фамилию"}, name='lastname')
     birthdate = StringField(validators=[Length(max=10), Regexp(r'\d\d\.\d\d\.\d{4}', message='Дата вида дд.мм.гггг')], render_kw={"placeholder": "Введите дату рождения"}, name='birthdate')
-    submit = SubmitField("Изменить")
+    submit = SubmitField("Сохранить")
 
 def validate_date(field):
         if re.fullmatch(field, r'\d\d\.\d\d\.\d{4}'):
             raise ValidationError('дата формата дд,мм.гггг')
         return True
 
-def binary_enc(img):
-    with open(img, 'rb') as f:
-        binar = b64encode(f.read())
-    return binar

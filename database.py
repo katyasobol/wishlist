@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, url_for, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, current_user, LoginManager, login_required, login_user, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
-from forms import LoginForm, RegisterForm, ProfileForm, validate_date, binary_enc
+from forms import LoginForm, RegisterForm, ProfileForm, validate_date
 import psycopg2
 
 app = Flask(__name__)
@@ -37,45 +37,59 @@ class Profile(db.Model):
     lastname = db.Column(db.String(80))
     birthdate = db.Column(db.String)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    img = db.Column(db.LargeBinary)
 
-    def __init__(self, firstname, lastname, birthdate, user_id, img):
+    def __init__(self, firstname, lastname, birthdate, user_id):
         self.firstname = firstname
         self.lastname = lastname
         self.birthdate = birthdate
         self.user_id = user_id
-        self.img = img
 
     def __repr__(self):
         return f'<profile {self.id}>'
 
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(80))
+    author_id = db.Column(db.Integer, db.ForeignKey('profile.id'))
+    price = db.Column(db.Float)
+    comment = db.Column(db.String(140))
+    url = db.Column(db.String)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
+    def __init__(self, title, author_id, price, comment, url, user_id):
+        self.title = title
+        self.author = author_id
+        self.price = price
+        self.comment = comment
+        self.url = url
+        self.user_id = user_id
+    
+    def __repr__(self):
+        return f'<post {self.id}>'
 
 with app.app_context():
     db.create_all()
 
 @app.route('/wishlist', methods=['POST', 'GET'])
 def index():
-    return redirect(url_for('login'))
+    return render_template('index.html')
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
     form = RegisterForm()
-    if request.method == "POST":
-        if form.validate_on_submit():
-            hash = generate_password_hash(request.form['psw'])
-            u = User(user=request.form['username'], email=request.form['email'], psw=hash)
-            try:
-                db.session.add(u)
-                db.session.commit()
-            except:
-                db.session.rollback()
-                print("Ошибка добавления в БД")
-            return redirect(url_for('update'))
-        flash('ошибка ввода данных')
+    if request.method == "POST" and form.validate_on_submit():
+        hash = generate_password_hash(request.form['psw'])
+        u = User(user=request.form['username'], email=request.form['email'], psw=hash)
+        try:
+            db.session.add(u)
+            db.session.commit()
+        except:
+            db.session.rollback()
+            print("Ошибка добавления в БД")
+        return redirect(url_for('update'))
     return render_template('register.html', title='Регистрация', form=form)
 
-@app.route('/profile/<int:id>', methods=('POST', 'GET'))
+@app.route('/profile', methods=('POST', 'GET'))
 @login_required
 def profile():
     form = None
@@ -89,11 +103,9 @@ def profile():
 @app.route('/register/update', methods=('POST', 'GET'))
 def update():
     form = ProfileForm()
-    if request.method == "POST":
+    if request.method == "POST" and form.validate_on_submit():
+        p = Profile(firstname=request.form['firstname'], lastname=request.form['lastname'], birthdate=request.form['birthdate'], user_id=current_user.id)
         try:
-            img = binary_enc(request.files['img'])
-            print(img)
-            p = Profile(firstname=request.form['firstname'], img=request.files['img'], lastname=request.form['lastname'], birthdate=request.form['birthdate'], user_id=current_user.id)
             db.session.add(p)
             db.session.commit()
         except:
@@ -106,12 +118,11 @@ def update():
 @app.route('/login', methods=('POST', 'GET')) 
 def login():
     form = LoginForm()
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            username = request.form.get('username')
-            psw = request.form.get('psw')
-            for raw in db.session.query(User).where(User.user == username):
-                user = raw
+    if request.method == 'POST' and form.validate_on_submit():
+        username = request.form.get('username')
+        psw = request.form.get('psw')
+        for raw in db.session.query(User).where(User.user == username):
+            user = raw
             if username == user.user and check_password_hash(user.psw, psw):
                 login_user(user=user)
                 return redirect(url_for('profile'))
@@ -141,7 +152,7 @@ def prof_upd():
             except:
                     db.session.rollback()
                     return 'hrsghe'
-        p = Profile(firstname=request.form['firstname'], lastname=request.form['lastname'], birthdate=request.form['birthdate'], user_id=current_user.id, img=request.form['img'])
+        p = Profile(firstname=request.form['firstname'], lastname=request.form['lastname'], birthdate=request.form['birthdate'], user_id=current_user.id)
         db.session.add(p)
         db.session.commit()
         return redirect(url_for('profile'))
