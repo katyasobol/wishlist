@@ -14,17 +14,17 @@
 <body>
     <section class="main">
         <div class="buttonset">
-            <a href="/profile/update" class="btn">Настройки</a>
+            <a href="/post" class="btn">Настройки</a>
         </div>
         <div class="buttonset">
-            <a href="/logout" class="btn1">Выйти</a>
+            <a href="/profile" class="btn1">Выйти</a>
         </div>
         <div class="profile-card">
             <div class="image">
                 <img src="data:;base64,{{ image }}" />
             </div>
             <div class="data">
-                <h2>{{ form.firstname }} {{ form.lastname }}</h2>
+                <h2>{{ form.title }}</h2>
                 <span>{{ current_user.user }}</span>
                 <h3>{{ form.birthdate }}</h3>
             </div>
@@ -43,7 +43,7 @@
                 </div>
             </div>
             <div class="buttons">
-                <a href="/showpost" class="btn">желания</a>
+                <a href="#" class="btn">желания</a>
                 <a href="/post" class="btn">создать желание</a>
             </div>
         </div>
@@ -51,3 +51,9 @@
 </body>
 
 </html>
+
+<ul>
+    <li><a class="active" href="#">Настройки</a></li>
+    <li><a href="#">About</a></li>
+    <li><a href="#">Services</a></li>
+</ul>

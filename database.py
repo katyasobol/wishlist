@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, url_for, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, current_user, LoginManager, login_required, login_user, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
-from forms import LoginForm, RegisterForm, validate_date, verify_img
+from forms import LoginForm, RegisterForm, validate_date, verify_img, PostForm
 from base64 import b64encode, b64decode
 import psycopg2
 
@@ -50,6 +50,26 @@ class Profile(db.Model):
     def __repr__(self):
         return f'<profile {self.id}>'
 
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(80))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    price = db.Column(db.Float)
+    comment = db.Column(db.String(140))
+    url = db.Column(db.String)
+    img = db.Column(db.LargeBinary)
+
+    def __init__(self, title, user_id, price, comment, url, img):
+        self.title = title
+        self.user_id = user_id
+        self.price = price
+        self.comment = comment
+        self.url = url
+        self.img = img
+    
+    def __repr__(self):
+        return f'<post {self.id}>'
+
 with app.app_context():
     db.create_all()
 
@@ -76,7 +96,7 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Регистрация', form=form)
 
-@app.route('/login', methods=('POST', 'GET')) 
+@app.route('/login', methods=['POST', 'GET']) 
 def login():
     form = LoginForm()
     if request.method == 'POST' and form.validate_on_submit():
@@ -96,7 +116,7 @@ def logout():
     logout_user()
     return redirect(url_for('index'))  
 
-@app.route('/profile', methods=('POST', 'GET'))
+@app.route('/profile', methods=['POST', 'GET'])
 @login_required
 def profile():
     form = None
@@ -104,11 +124,11 @@ def profile():
         image = None
         for raw in db.session.query(Profile).where(Profile.user_id == current_user.id):
                 form = raw
-                image = b64encode(form.img)
+                image = b64decode(form.img)
         return render_template('profile.html', title='Профайл', form=form, image=image)
     return redirect(url_for('login'))  
 
-@app.route('/profile/update', methods=('POST', 'GET'))
+@app.route('/profile/update', methods=['POST', 'GET'])
 @login_required
 def prof_upd():
     if request.method == 'POST':
@@ -128,6 +148,24 @@ def prof_upd():
                 return 'hrsghe'
         return redirect(url_for('profile'))
     return render_template('prof_upd.html')
+
+@app.route('/post', methods=['POST', 'GET'])
+@login_required
+def post():
+    form = PostForm()
+    if request.method == "POST" and form.validate_on_submit() and verify_img(request.files['img'].filename):
+        for raw in db.session.query(Profile).where(Profile.user_id == current_user.id):
+            t = raw.id
+        print(type(t))
+        try:
+            p = Post(title=request.form['title'], price=request.form['price'], url=request.form['url'], img=request.files[form.img.name].read(), user_id=current_user.id, comment=request.form['comment'])
+            db.session.add(p)
+            db.session.commit()
+        except:
+            db.session.rollback()
+            return 'mistake'
+        return render_template('showpost.html')
+    return render_template('post.html', form=form)
 
 if __name__ == '__main__':
     app.run(debug=True)
