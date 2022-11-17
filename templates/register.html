@@ -13,9 +13,10 @@
     <div class="container">
         <div class="title">Регистрация</div>
         <div class="content">
-            <form action="#" method="post">
+            <form action="#" method="post" enctype="multipart/form-data">
                 {{ form.hidden_tag() }}
                 <div class="user-details">
+                    <button><input type='file' name='img' id='file-input' multiple></button>
                     <div class="input-box">
                         <span class="details">Username</span>
                         {{ form.username }}
@@ -23,6 +24,18 @@
                     <div class="input-box">
                         <span class="details">Email</span>
                         {{ form.email }}
+                    </div>
+                    <div class="input-box">
+                        <span class="details">Имя</span>
+                        {{ form.firstname }}
+                    </div>
+                    <div class="input-box">
+                        <span class="details">Фамилия</span>
+                        {{ form.lastname }}
+                    </div>
+                    <div class="input-box">
+                        <span class="details">День рождения</span>
+                        {{ form.birthdate }}
                     </div>
                     <div class="input-box">
                         <span class="details">Пароль</span>
