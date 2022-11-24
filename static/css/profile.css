@@ -58,6 +58,32 @@
     position: relative;
 }
 
+.datapost {
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    margin-top: 30px;
+}
+
+.datapost h2 {
+    font-size: 40px;
+    font-weight: 700;
+    position: relative;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20%;
+    margin-right: 90%;
+}
+
+.list h2 {
+    font-size: 50px;
+    font-weight: 700;
+    position: relative;
+}
+
 span {
     font-size: 18px;
 }
@@ -124,5 +150,38 @@ span {
 }
 
 .buttonset .btn:hover {
+    box-shadow: inset 0 5px 20px rgba(0, 0, 0, 0.4);
+}
+
+.buttonlist {
+    display: flex;
+    position: relative;
+    left: 85%;
+    margin-bottom: 48%;
+}
+
+.buttonlist .btn {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 10px;
+    padding: 8px 25px;
+    border-radius: 8px;
+    font-size: 18px;
+    white-space: nowrap;
+    background: linear-gradient(to left, #33ccff 0%, #ff99cc 100%);
+}
+
+.buttonlist .btn1 {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 5px;
+    padding: 8px 25px;
+    border-radius: 8px;
+    font-size: 18px;
+    white-space: nowrap;
+
+}
+
+.buttonlist .btn:hover {
     box-shadow: inset 0 5px 20px rgba(0, 0, 0, 0.4);
 }

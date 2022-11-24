@@ -21,26 +21,13 @@
         </div>
         <div class="profile-card">
             <div class="image">
-                <img src="data:;base64,{{ image }}" />
+                <img src="data:(image);base64,{{ image }}" />
             </div>
-            <div class="data">
+            <div class="datapost">
                 <h2>{{ form.title }}</h2>
-                <span>{{ current_user.user }}</span>
-                <h3>{{ form.birthdate }}</h3>
-            </div>
-            <div class="row">
-                <div class="info">
-                    <h3>Following</h3>
-                    <span>120</span>
-                </div>
-                <div class="info">
-                    <h3>Followers</h3>
-                    <span>5000</span>
-                </div>
-                <div class="info">
-                    <h3>Posts</h3>
-                    <span>209</span>
-                </div>
+                <h3>{{ form.price }}</h3>
+                <h3><a href="{{ form.url }}">{{ form.url }}</a></h3>
+                <h3>{{ form.comment }}</h3>
             </div>
             <div class="buttons">
                 <a href="#" class="btn">желания</a>
@@ -51,9 +38,3 @@
 </body>
 
 </html>
-
-<ul>
-    <li><a class="active" href="#">Настройки</a></li>
-    <li><a href="#">About</a></li>
-    <li><a href="#">Services</a></li>
-</ul>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<!---Coding By CoderGirl!--->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!--<title> Profle Card UI Design | CoderGirl </title>-->
+    <!---Custom Css File!--->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css')}}">
+</head>
+
+<body>
+    <section class="main">
+        <div class="buttonlist">
+            <a href="/profile/update" class="btn">Настройки</a>
+            <a href="/logout" class="btn1">Выйти</a>
+        </div>
+        <div class="list">
+            {%for p in form %}
+            <h3><a href="/showpost/{{ p.id }}">{{ p.title }}</a></h3>
+            {% endfor %}
+        </div>
+    </section>
+</body>
+
+</html>

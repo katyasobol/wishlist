@@ -86,7 +86,9 @@ def register():
             u = User(user=request.form['username'], email=request.form['email'], psw=hash)
             db.session.add(u)
             db.session.flush()
-            p = Profile(firstname=request.form['firstname'], lastname=request.form['lastname'], birthdate=request.form['birthdate'], user_id=u.id, img=request.files[form.img.name].read())
+            image = request.files['img']
+            encode = b64encode(image.read()).decode('utf-8')
+            p = Profile(firstname=request.form['firstname'], lastname=request.form['lastname'], birthdate=request.form['birthdate'], user_id=u.id, img=encode)
             db.session.add(p)
             db.session.commit()
         except:
@@ -124,23 +126,22 @@ def profile():
         image = None
         for raw in db.session.query(Profile).where(Profile.user_id == current_user.id):
                 form = raw
-                image = b64decode(form.img)
-        return render_template('profile.html', title='Профайл', form=form, image=image)
+                image = b64decode(form.img).decode('utf-8')
+        return render_template('profile.html', form=form, image=image)
     return redirect(url_for('login'))  
 
 @app.route('/profile/update', methods=['POST', 'GET'])
 @login_required
 def prof_upd():
     if request.method == 'POST':
-        print(request.files['img'].read())
+        #print(b64encode(request.files['img'].read()).decode('utf-8'))
         try:
             for raw in db.session.query(Profile).where(Profile.user_id == current_user.id):
                 user = raw
                 user.firstname = request.form.get('firstname') if request.form.get('firstname') else user.firstname
                 user.lastname = request.form.get('lastname') if request.form.get('lastname') else user.lastname
                 user.birthdate = request.form.get('birthdate') if request.form.get('birthdate') and validate_date(request.form.get('birthdate')) else user.birthdate
-                user.img = request.files['img'].read() if request.files['img'] else user.img
-                print(request.files['img'])
+                user.img = b64encode(request.files['img'].read()) if request.files['img'] else user.img
                 db.session.commit()
                 return redirect(url_for('profile'))
         except:
@@ -149,23 +150,38 @@ def prof_upd():
         return redirect(url_for('profile'))
     return render_template('prof_upd.html')
 
-@app.route('/post', methods=['POST', 'GET'])
+@app.route('/newpost', methods=['POST', 'GET'])
 @login_required
 def post():
     form = PostForm()
     if request.method == "POST" and form.validate_on_submit() and verify_img(request.files['img'].filename):
-        for raw in db.session.query(Profile).where(Profile.user_id == current_user.id):
-            t = raw.id
-        print(type(t))
         try:
-            p = Post(title=request.form['title'], price=request.form['price'], url=request.form['url'], img=request.files[form.img.name].read(), user_id=current_user.id, comment=request.form['comment'])
+            encode = b64encode(request.files['img'].read())
+            p = Post(title=request.form['title'], price=request.form['price'], url=request.form['url'], img=encode, user_id=current_user.id, comment=request.form['comment'])
             db.session.add(p)
             db.session.commit()
         except:
             db.session.rollback()
             return 'mistake'
-        return render_template('showpost.html')
+        return redirect(url_for('showpost'))
     return render_template('post.html', form=form)
+
+@app.route('/showpost/<int:post_id>', methods=['POST', 'GET'])
+@login_required
+def showpost(post_id):
+    form = None
+    if current_user.is_authenticated:
+        image = None
+        for raw in db.session.query(Post).where(Post.id == post_id):
+                form = raw
+                image = b64decode(form.img)
+        return render_template('showpost.html', form=form, image=image)
+    return redirect(url_for('login'))  
+
+@app.route('/posts', methods=['POST', 'GET'])
+def posts():
+    raw = db.session.query(Post).where(Post.user_id == current_user.id)
+    return render_template('posts.html', form=raw)
 
 if __name__ == '__main__':
     app.run(debug=True)
