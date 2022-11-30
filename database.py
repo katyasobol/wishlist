@@ -13,8 +13,6 @@ app.secret_key = 'fdgfh78@#5?>gfhf80dx,v06'
 db = SQLAlchemy(app)
 db.init_app(app)
 
-MAX_CONTENT_LENGTH = 1024 * 1024
-
 login_manager = LoginManager(app)
 
 @login_manager.user_loader
@@ -163,7 +161,7 @@ def post():
         except:
             db.session.rollback()
             return 'mistake'
-        return redirect(url_for('showpost'))
+        return redirect(url_for('profile'))
     return render_template('post.html', form=form)
 
 @app.route('/showpost/<int:post_id>', methods=['POST', 'GET'])
@@ -182,6 +180,26 @@ def showpost(post_id):
 def posts():
     raw = db.session.query(Post).where(Post.user_id == current_user.id)
     return render_template('posts.html', form=raw)
+
+@app.route('/post/update', methods=['POST', 'GET'])
+@login_required
+def post_upd():
+    if request.method == 'POST':
+        try:
+            for raw in db.session.query(Post).where(Post.user_id == current_user.id):
+                user = raw
+                user.title = request.form.get('title') if request.form.get('title') else user.title
+                user.price = request.form.get('price') if request.form.get('price') else user.price
+                user.comment = request.form.get('comment') if request.form.get('comment') else user.comment
+                user.url = request.form.get('url') if request.form.get('url') else user.url
+                user.img = b64encode(request.files['img'].read()) if request.files['img'] else user.img
+                db.session.commit()
+                return redirect(url_for('profile'))
+        except:
+                db.session.rollback()
+                return 'hrsghe'
+        return redirect(url_for('profile'))
+    return render_template('post_upd.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
