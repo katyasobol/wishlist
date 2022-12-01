@@ -19,6 +19,11 @@
         <div class="list">
             {%for p in form %}
             <h3><a href="/showpost/{{ p.id }}">{{ p.title }}</a></h3>
+            {% if p.id in book %}
+            <h4>Забронирован</h4>
+            {% else %}
+            <h4></h4>
+            {% endif %}
             {% endfor %}
         </div>
     </section>

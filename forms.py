@@ -1,5 +1,5 @@
 from flask_wtf.form import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, EmailField, ValidationError, FileField, FloatField, URLField
+from wtforms import StringField, PasswordField, SubmitField, EmailField, ValidationError, FileField, FloatField, URLField, BooleanField
 from wtforms.validators import InputRequired, Length, Email, EqualTo, Regexp
 import re
 
@@ -28,6 +28,12 @@ class PostForm(FlaskForm):
     url = URLField(name='url')
     img = FileField(name='img', id='file-input')
     submit = SubmitField("Сохранить")
+
+class BookForm(FlaskForm):
+    name = StringField(render_kw={"placeholder": "Введите свое имя"}, name='name')
+    email = EmailField(validators=[Email(message='Некорректный email')], render_kw={"placeholder": "Введите свой email"}, name='email')
+    book = BooleanField()
+    submit = SubmitField("Забронировать")
 
 def validate_date(field):
         if re.fullmatch(field, r'\d\d\.\d\d\.\d{4}'):

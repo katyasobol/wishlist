@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, url_for, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, current_user, LoginManager, login_required, login_user, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
-from forms import LoginForm, RegisterForm, validate_date, verify_img, PostForm
+from forms import LoginForm, RegisterForm, validate_date, verify_img, PostForm, BookForm
 from base64 import b64encode, b64decode
 import psycopg2
 
@@ -64,6 +64,22 @@ class Post(db.Model):
         self.comment = comment
         self.url = url
         self.img = img
+    
+    def __repr__(self):
+        return f'<post {self.id}>'
+
+class Book(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80))
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    book = db.Column(db.Boolean)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+
+    def __init__(self, name, email, book, post_id):
+        self.name = name
+        self.email = email
+        self.book = book
+        self.post_id = post_id
     
     def __repr__(self):
         return f'<post {self.id}>'
@@ -165,21 +181,24 @@ def post():
     return render_template('post.html', form=form)
 
 @app.route('/showpost/<int:post_id>', methods=['POST', 'GET'])
-@login_required
 def showpost(post_id):
     form = None
-    if current_user.is_authenticated:
-        image = None
-        for raw in db.session.query(Post).where(Post.id == post_id):
-                form = raw
-                image = b64decode(form.img)
-        return render_template('showpost.html', form=form, image=image)
-    return redirect(url_for('login'))  
+    image = None
+    book = None
+    for raw in db.session.query(Post).where(Post.id == post_id):
+        form = raw
+        image = b64decode(form.img)
+    return render_template('showpost.html', form=form, image=image, book=book)
 
-@app.route('/posts', methods=['POST', 'GET'])
-def posts():
-    raw = db.session.query(Post).where(Post.user_id == current_user.id)
-    return render_template('posts.html', form=raw)
+    
+
+@app.route('/posts/<int:post_id>', methods=['POST', 'GET'])
+def posts(post_id):
+    book = []
+    raw = db.session.query(Post).where(Post.user_id == post_id)
+    for p in db.session.query(Book).where(Book.book == True):
+        book.append(p.post_id)
+    return render_template('posts.html', form=raw, book=book)
 
 @app.route('/post/update', methods=['POST', 'GET'])
 @login_required
@@ -212,6 +231,25 @@ def delete(post_id):
     except:
         db.session.rollback()
         return 'mistake'
+
+@app.route('/book/<int:post_id>', methods=['POST', 'GET'])
+def book(post_id):
+    form = BookForm()
+    if request.method == 'POST' and form.validate_on_submit():
+        try:
+            booked = True if request.form['book'] else False
+            for raw in db.session.query(Post).where(Post.id == post_id):
+                postid = raw.id
+                p = Book(name=request.form['name'], email=request.form['email'], book=booked, post_id=postid)
+                db.session.add(p)
+                db.session.commit()
+            return redirect(url_for('showpost', post_id=post_id))
+        except:
+            db.session.rollback()
+            print("Ошибка добавления в БД")
+            return 'mistake'
+    return render_template('book.html', form=form)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
