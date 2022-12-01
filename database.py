@@ -201,6 +201,18 @@ def post_upd():
         return redirect(url_for('profile'))
     return render_template('post_upd.html')
 
+@app.route('/showpost/<int:post_id>/delete', methods=['POST', 'GET'])
+@login_required
+def delete(post_id):
+    try:
+        post = Post.query.get(post_id)
+        db.session.delete(post)
+        db.session.commit()
+        return redirect(url_for('posts'))
+    except:
+        db.session.rollback()
+        return 'mistake'
+
 if __name__ == '__main__':
     app.run(debug=True)
 
