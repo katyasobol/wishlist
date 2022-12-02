@@ -71,7 +71,7 @@ class Post(db.Model):
 class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    email = db.Column(db.String(120),nullable=False)
     book = db.Column(db.Boolean)
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
 
@@ -122,7 +122,7 @@ def login():
             user = raw
             if username == user.user and check_password_hash(user.psw, psw):
                 login_user(user=user)
-                return redirect(url_for('profile'))
+                return redirect(url_for('profile', user_id=current_user.id))
             flash("Неверная пара логин/пароль", "error")
     return render_template('login.html', form=form)  
 
@@ -132,9 +132,9 @@ def logout():
     logout_user()
     return redirect(url_for('index'))  
 
-@app.route('/profile', methods=['POST', 'GET'])
+@app.route('/profile/<int:user_id>', methods=['POST', 'GET'])
 @login_required
-def profile():
+def profile(user_id):
     form = None
     if current_user.is_authenticated:
         image = None
@@ -157,11 +157,11 @@ def prof_upd():
                 user.birthdate = request.form.get('birthdate') if request.form.get('birthdate') and validate_date(request.form.get('birthdate')) else user.birthdate
                 user.img = b64encode(request.files['img'].read()) if request.files['img'] else user.img
                 db.session.commit()
-                return redirect(url_for('profile'))
+                return redirect(url_for('profile', user_id=current_user.id))
         except:
                 db.session.rollback()
                 return 'hrsghe'
-        return redirect(url_for('profile'))
+        return redirect(url_for('profile', user_id=current_user.id))
     return render_template('prof_upd.html')
 
 @app.route('/newpost', methods=['POST', 'GET'])
@@ -177,7 +177,7 @@ def post():
         except:
             db.session.rollback()
             return 'mistake'
-        return redirect(url_for('profile'))
+        return redirect(url_for('profile', user_id=current_user.id))
     return render_template('post.html', form=form)
 
 @app.route('/showpost/<int:post_id>', methods=['POST', 'GET'])
