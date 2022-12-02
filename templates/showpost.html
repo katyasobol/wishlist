@@ -12,7 +12,6 @@
 </head>
 
 <body>
-    {% if current_user.id == form.user_id %}
     <section class="main">
         <div class="buttonset">
             <a href="/posts/{{ form.user_id }}" class="btn1">Выйти</a>
@@ -27,29 +26,14 @@
                 <h3><a href="{{ form.url }}">{{ form.url }}</a></h3>
                 <h3>{{ form.comment }}</h3>
             </div>
-        </div>
-    </section>
-    {% else %}
-    <section class="main">
-        <div class="buttonset">
-            <a href="/posts/{{ form.user_id }}" class="btn1">Выйти</a>
-        </div>
-        <div class="profile-card">
-            <div class="image">
-                <img src="data:(image);base64,{{ image }}" />
-            </div>
-            <div class="datapost">
-                <h2>{{ form.title }}</h2>
-                <h3>{{ form.price }}</h3>
-                <h3><a href="{{ form.url }}">{{ form.url }}</a></h3>
-                <h3>{{ form.comment }}</h3>
-            </div>
+            {% if current_user.id == form.user_id %}
+            {% else %}
             <div class="buttons">
                 <a href="/book/{{ form.id }}" class="btn">Забронировать</a>
             </div>
+            {% endif %}
         </div>
     </section>
-    {% endif %}
 </body>
 
 </html>

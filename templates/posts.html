@@ -13,16 +13,34 @@
 
 <body>
     <section class="main">
+        {% if current_user.is_authenticated and current_user.id == user_id %}
         <div class="buttonlist">
-            <a href="/profile" class="btn1">Выйти</a>
+            <a href="/post" class="btn">Добавить желание</a>
         </div>
+        <div class="buttonlist">
+            <a href="/profile" class="btn1">Вернуться</a>
+        </div>
+        {% elif current_user.is_authenticated and current_user.id != user_id %}
+        <div class="buttonlist">
+            <a href="/post" class="btn">nfjdo</a>
+        </div>
+        <div class="buttonlist">
+            <a href="/profile" class="btn1">Вернуться</a>
+        </div>
+        {% else %}
+        <div class="buttonlist">
+            <a href="/register" class="btn">Регистрация</a>
+        </div>
+        <div class="buttonlist">
+            <a href="/login" class="btn1">Войти</a>
+        </div>
+        {% endif %}
         <div class="list">
             {%for p in form %}
             <h3><a href="/showpost/{{ p.id }}">{{ p.title }}</a></h3>
             {% if p.id in book %}
             <h4>Забронирован</h4>
             {% else %}
-            <h4></h4>
             {% endif %}
             {% endfor %}
         </div>

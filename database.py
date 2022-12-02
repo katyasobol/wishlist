@@ -195,10 +195,13 @@ def showpost(post_id):
 @app.route('/posts/<int:post_id>', methods=['POST', 'GET'])
 def posts(post_id):
     book = []
+    user_id = None
     raw = db.session.query(Post).where(Post.user_id == post_id)
+    for u in raw:
+        user_id = u.user_id
     for p in db.session.query(Book).where(Book.book == True):
         book.append(p.post_id)
-    return render_template('posts.html', form=raw, book=book)
+    return render_template('posts.html', form=raw, book=book, user_id=user_id)
 
 @app.route('/post/update', methods=['POST', 'GET'])
 @login_required
