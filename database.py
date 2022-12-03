@@ -223,14 +223,20 @@ def post_upd():
         return redirect(url_for('profile'))
     return render_template('post_upd.html')
 
-@app.route('/showpost/<int:post_id>/delete', methods=['POST', 'GET'])
+@app.route('/showpost/delete/<int:post_id>', methods=['POST', 'GET'])
 @login_required
 def delete(post_id):
     try:
+        book_id = None
         post = Post.query.get(post_id)
+        for p in db.session.query(Book).where(Book.post_id == post.id):
+            book_id = p.id
+        if book_id != None:
+            book = Book.query.get(book_id)
+            db.session.delete(book)
         db.session.delete(post)
         db.session.commit()
-        return redirect(url_for('posts'))
+        return redirect(url_for('posts', post_id=post_id))
     except:
         db.session.rollback()
         return 'mistake'

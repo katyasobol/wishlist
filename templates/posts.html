@@ -20,13 +20,6 @@
         <div class="buttonlist">
             <a href="/profile/{{ current_user.id }}" class="btn1">Вернуться</a>
         </div>
-        {% elif current_user.is_authenticated and current_user.id != user_id %}
-        <div class="buttonlist">
-            <a href="/post" class="btn">nfjdo</a>
-        </div>
-        <div class="buttonlist">
-            <a href="/profile/{{ current_user.id }}" class="btn1">Вернуться</a>
-        </div>
         {% else %}
         <div class="buttonlist">
             <a href="/register" class="btn">Регистрация</a>

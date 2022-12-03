@@ -27,6 +27,9 @@
                 <h3>{{ form.comment }}</h3>
             </div>
             {% if current_user.id == form.user_id %}
+            <div class="buttons">
+                <a href="/showpost/delete/{{ form.id }}" class="btn">Удалить</a>
+            </div>
             {% else %}
             <div class="buttons">
                 <a href="/book/{{ form.id }}" class="btn">Забронировать</a>
