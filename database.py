@@ -7,7 +7,7 @@ from base64 import b64encode, b64decode
 import psycopg2
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:10122000kot@localhost/postgres'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgresql:password@localhost/postgres'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'fdgfh78@#5?>gfhf80dx,v06'
 db = SQLAlchemy(app)
