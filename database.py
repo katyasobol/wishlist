@@ -7,7 +7,7 @@ from base64 import b64encode, b64decode
 import psycopg2
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgresql:password@localhost/postgres'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:10122000kot@localhost/postgres'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'fdgfh78@#5?>gfhf80dx,v06'
 db = SQLAlchemy(app)
@@ -118,8 +118,7 @@ def login():
     if request.method == 'POST' and form.validate_on_submit():
         username = request.form.get('username')
         psw = request.form.get('psw')
-        for raw in db.session.query(User).where(User.user == username):
-            user = raw
+        for user in db.session.query(User).where(User.user == username):
             if username == user.user and check_password_hash(user.psw, psw):
                 login_user(user=user)
                 return redirect(url_for('profile', user_id=current_user.id))
@@ -135,12 +134,10 @@ def logout():
 @app.route('/profile/<int:user_id>', methods=['POST', 'GET'])
 @login_required
 def profile(user_id):
-    form = None
     if current_user.is_authenticated:
         image = None
-        for raw in db.session.query(Profile).where(Profile.user_id == current_user.id):
-                form = raw
-                image = b64decode(form.img).decode('utf-8')
+        for form in db.session.query(Profile).where(Profile.user_id == current_user.id):
+            image = b64decode(form.img).decode('utf-8')
         return render_template('profile.html', form=form, image=image)
     return redirect(url_for('login'))  
 
@@ -148,12 +145,10 @@ def profile(user_id):
 @login_required
 def prof_upd():
     if request.method == 'POST':
-        #print(b64encode(request.files['img'].read()).decode('utf-8'))
         try:
-            for raw in db.session.query(Profile).where(Profile.user_id == current_user.id):
-                user = raw
-                user.firstname = request.form.get('firstname') if request.form.get('firstname') else user.firstname
-                user.lastname = request.form.get('lastname') if request.form.get('lastname') else user.lastname
+            for user in db.session.query(Profile).where(Profile.user_id == current_user.id):
+                user.firstname = request.form.get('firstname', user.firstname) 
+                user.lastname = request.form.get('lastname', user.lastname)
                 user.birthdate = request.form.get('birthdate') if request.form.get('birthdate') and validate_date(request.form.get('birthdate')) else user.birthdate
                 user.img = b64encode(request.files['img'].read()) if request.files['img'] else user.img
                 db.session.commit()
@@ -182,13 +177,10 @@ def post():
 
 @app.route('/showpost/<int:post_id>', methods=['POST', 'GET'])
 def showpost(post_id):
-    form = None
     image = None
-    book = None
-    for raw in db.session.query(Post).where(Post.id == post_id):
-        form = raw
+    for form in db.session.query(Post).where(Post.id == post_id):
         image = b64decode(form.img)
-    return render_template('showpost.html', form=form, image=image, book=book)
+    return render_template('showpost.html', form=form, image=image)
 
     
 
@@ -196,24 +188,23 @@ def showpost(post_id):
 def posts(post_id):
     book = []
     user_id = None
-    raw = db.session.query(Post).where(Post.user_id == post_id)
-    for u in raw:
+    post = db.session.query(Post).where(Post.user_id == post_id)
+    for u in post:
         user_id = u.user_id
     for p in db.session.query(Book).where(Book.book == True):
         book.append(p.post_id)
-    return render_template('posts.html', form=raw, book=book, user_id=user_id)
+    return render_template('posts.html', form=post, book=book, user_id=user_id)
 
 @app.route('/post/update', methods=['POST', 'GET'])
 @login_required
 def post_upd():
     if request.method == 'POST':
         try:
-            for raw in db.session.query(Post).where(Post.user_id == current_user.id):
-                user = raw
-                user.title = request.form.get('title') if request.form.get('title') else user.title
-                user.price = request.form.get('price') if request.form.get('price') else user.price
-                user.comment = request.form.get('comment') if request.form.get('comment') else user.comment
-                user.url = request.form.get('url') if request.form.get('url') else user.url
+            for user in db.session.query(Post).where(Post.user_id == current_user.id):
+                user.title = request.form.get('title', user.title)
+                user.price = request.form.get('price', user.price)
+                user.comment = request.form.get('comment', user.comment)
+                user.url = request.form.get('url', user.url)
                 user.img = b64encode(request.files['img'].read()) if request.files['img'] else user.img
                 db.session.commit()
                 return redirect(url_for('profile'))
@@ -247,8 +238,8 @@ def book(post_id):
     if request.method == 'POST' and form.validate_on_submit():
         try:
             booked = True if request.form['book'] else False
-            for raw in db.session.query(Post).where(Post.id == post_id):
-                postid = raw.id
+            for post in db.session.query(Post).where(Post.id == post_id):
+                postid = post.id
                 p = Book(name=request.form['name'], email=request.form['email'], book=booked, post_id=postid)
                 db.session.add(p)
                 db.session.commit()
